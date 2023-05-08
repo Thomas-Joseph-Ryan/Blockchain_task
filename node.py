@@ -41,7 +41,7 @@ class ServerRunner():
 		self.host = host
 		self.port = port
 		self.failure_tolerance = f
-		self.remote_nodes : list[long_lived_client.LongLivedClient] = []
+		self.remote_nodes : list[socket.socket] = []
 		self.incoming_msgs = queue.Queue()
 		self.stop_event = threading.Event()
 
@@ -52,66 +52,62 @@ class ServerRunner():
 		self.logger.addHandler(handler)
 		self.logger.setLevel(logging.INFO)
 		self.logger.info("Node starting")
-		self.listen_thread = threading.Thread(target=self.listen)
+		self.server_thread = threading.Thread(target=self.start_server)
 		
 	def start(self):
-		self.listen_thread.start()
+		self.server_thread.start()
 
 	def stop(self):
 		self.stop_event.set()
-		self.listen_thread.join()
+		# self.listen_thread.join()
 		for s in self.remote_nodes:
-			s.disconnect()
+			s.close()
+
+	def message_received(self, message):
+    # Process the received message and calculate a response
+    # response = ...
+		response = f"received {message}"
+		return response
 
 	def append(self, remote_node: RemoteNode):
-		connection_to_other_server_runner = long_lived_client.LongLivedClient(remote_node.host, remote_node.port)
-		connection_to_other_server_runner.connect()
-		self.remote_nodes.append(connection_to_other_server_runner)
+		remote_socket = self.connect_to_node(remote_node.host, remote_node.port)
+		self.remote_nodes.append(remote_socket)
 
-	def listen_long_lived(self, ll_client: long_lived_client.LongLivedClient):
-		ll_client.receive_message
-	
-	def handle_client(self, conn : socket.socket, client_addr):
-		try:
-			conn.settimeout(5)
-			connected = True
-			while not self.stop_event.is_set():
-				try:
-					data = recv_prefixed(conn)
-					if data:
-						print(f"Received from {client_addr}: {data}")
-						self.incoming_msgs.put(data)
-						connected = True
-					else:
-						if connected == False:
-							break
-						connected = False
-				except socket.timeout:
-					continue
-				except Exception as e:
-					print(f"Error while handling client {client_addr}: {e}")
+	def start_server(self):
+		self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+		self.server_socket.bind((self.host, self.port))
+		self.server_socket.listen()
+		self.logger.info(f"Server listening on {self.host}:{self.port}")
+
+		while not self.stop_event.is_set():
+			client_sock, client_add = self.server_socket.accept()
+			self.logger.info(f"Connection from {client_add}")
+			client_thread = threading.Thread(target=self.handle_client, args=(client_sock,))
+			client_thread.start()
+
+	def handle_client(self, client_socket: socket.socket):
+		while not self.stop_event.is_set():
+			try:
+				data = recv_prefixed(client_socket)
+				if not data: 
 					break
-		finally:
-			print(f"Closing connection with {client_addr}")
-			conn.close()
 
-	def listen(self):
-		try:
-			with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-				s.bind((self.host, self.port))
-				s.listen()
+				self.logger.info(f"Received from {client_socket.getpeername()}: {data.decode('utf-8')}")
+			except Exception as e:
+				self.logger.error(f"Error handling client {client_socket.getpeername()}: {e}")
+		
+		client_socket.close()
 
-				while not self.stop_event.is_set():
-					try:
-						conn, client_addr = s.accept()
-						client_thread = threading.Thread(target=self.handle_client, args=(conn, client_addr))
-						client_thread.daemon = True
-						client_thread.start()
-					except Exception as e:
-						print(f"Error when connecting to client {e}")
+	def connect_to_node(self, remote_host, remote_port):
+		remote_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+		remote_socket.connect((remote_host, remote_port))
+		self.logger.info(f"Connected to {remote_host}:{remote_socket}")
+		return remote_socket
 
-		except Exception as e:
-			print(f"Exception in listen thread {e}")
+	# This method will be used to broadcast a values message
+	def broadcast_message(self, message):
+		for remote_node in self.remote_nodes:
+			send_prefixed(remote_node, message.encode('utf-8'))
 
 	def validate_transaction(self, transaction: dict):
 		payload_keys = ['sender','message', 'nonce','signature']

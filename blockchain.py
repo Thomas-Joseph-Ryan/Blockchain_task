@@ -1,5 +1,6 @@
 import json
 import hashlib
+from typing import Callable
 
 class Blockchain():
     def  __init__(self):
@@ -29,7 +30,7 @@ class Blockchain():
         hex_hash = raw_hash.hexdigest()
         return hex_hash
 
-    def set_on_new_block(self, on_new_block: function):
+    def set_on_new_block(self, on_new_block: Callable):
         self.on_new_block = on_new_block
 	
     def add_transaction(self, transaction):

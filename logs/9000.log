@@ -1,1 +1,20 @@
 2023-04-24 15:56:43,510 [INFO] Node starting
+2023-05-08 10:34:45,193 [INFO] Node starting
+2023-05-08 10:51:22,726 [INFO] Node starting
+2023-05-08 10:51:32,174 [INFO] Node starting
+2023-05-08 11:51:20,777 [INFO] Node starting
+2023-05-08 11:51:56,624 [INFO] Node starting
+2023-05-08 11:51:56,627 [INFO] Server listening on localhost:9000
+2023-05-08 11:54:11,170 [INFO] Node starting
+2023-05-08 11:54:11,172 [INFO] Server listening on localhost:9000
+2023-05-08 11:59:48,144 [INFO] Node starting
+2023-05-08 11:59:48,149 [INFO] Server listening on localhost:9000
+2023-05-08 11:59:48,656 [INFO] Connected to localhost:<socket.socket fd=688, family=2, type=1, proto=0, laddr=('127.0.0.1', 52125), raddr=('127.0.0.1', 9001)>
+2023-05-08 11:59:48,656 [INFO] Connected to localhost:<socket.socket fd=768, family=2, type=1, proto=0, laddr=('127.0.0.1', 52126), raddr=('127.0.0.1', 9002)>
+2023-05-08 11:59:48,656 [INFO] Connected to localhost:<socket.socket fd=780, family=2, type=1, proto=0, laddr=('127.0.0.1', 52127), raddr=('127.0.0.1', 9003)>
+2023-05-08 11:59:48,657 [INFO] Connection from ('127.0.0.1', 52128)
+2023-05-08 11:59:48,658 [INFO] Connection from ('127.0.0.1', 52131)
+2023-05-08 11:59:48,658 [INFO] Connection from ('127.0.0.1', 52134)
+2023-05-08 11:59:55,661 [ERROR] Error handling client ('127.0.0.1', 52128): socket connection broken
+2023-05-08 11:59:55,662 [ERROR] Error handling client ('127.0.0.1', 52131): socket connection broken
+2023-05-08 11:59:55,663 [ERROR] Error handling client ('127.0.0.1', 52134): socket connection broken
