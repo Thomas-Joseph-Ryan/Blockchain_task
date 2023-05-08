@@ -5,7 +5,6 @@ import socket
 import pickle
 import cryptography.hazmat.primitives.asymmetric.ed25519 as ed25519
 import logging
-import long_lived_client
 from network import *
 
 
@@ -47,7 +46,7 @@ class ServerRunner():
 
 		#Set up logger
 		self.logger = logging.getLogger(f"{port}")
-		handler = logging.FileHandler(f"./logs/{port}.log")
+		handler = logging.FileHandler(f"./logs/{port}.log", mode='w')
 		handler.setFormatter(logging.Formatter('%(asctime)s [%(levelname)s] %(message)s'))
 		self.logger.addHandler(handler)
 		self.logger.setLevel(logging.INFO)
@@ -58,6 +57,7 @@ class ServerRunner():
 		self.server_thread.start()
 
 	def stop(self):
+		self.logger.info("Stopping server")
 		self.stop_event.set()
 		# self.listen_thread.join()
 		for s in self.remote_nodes:
@@ -77,27 +77,63 @@ class ServerRunner():
 		self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		self.server_socket.bind((self.host, self.port))
 		self.server_socket.listen()
+		self.server_socket.settimeout(3.0)
 		self.logger.info(f"Server listening on {self.host}:{self.port}")
 
 		while not self.stop_event.is_set():
-			client_sock, client_add = self.server_socket.accept()
+			try:
+				client_sock, client_add = self.server_socket.accept()
+			except socket.timeout:
+				continue
 			self.logger.info(f"Connection from {client_add}")
 			client_thread = threading.Thread(target=self.handle_client, args=(client_sock,))
 			client_thread.start()
 
+
+# We can use this method to receive requests from remote nodes and send
+# them responses
 	def handle_client(self, client_socket: socket.socket):
+		conn_failed = False
 		while not self.stop_event.is_set():
 			try:
 				data = recv_prefixed(client_socket)
 				if not data: 
 					break
-
+				conn_failed = False
 				self.logger.info(f"Received from {client_socket.getpeername()}: {data.decode('utf-8')}")
+				# So we have the socket here, so when we get a request from
+				# a client we can use this socket (i think)
+				data = data.decode('utf-8')
+
+				if data.startswith("Response:"):
+					continue
+
+				response = f"Response: Received {data}"
+				self.logger.info(f"Sending response {response}")
+
+				send_prefixed(client_socket, response.encode('utf-8'))
+
+				# The messages received will always be a pickle'd dictionary
+				# of the form {"type": x, "payload": x}
+				# received_dict = pickle.loads(data)
+
+			except RuntimeError as e:
+				if conn_failed == False:
+					self.logger.error(f'Connection failed first time {client_socket.getpeername()}: {type(e).__name__}: {e}')
+					conn_failed = True
+				elif conn_failed == True:
+					self.logger.error(f'Connection failed second time, closing connection {client_socket.getpeername()}: {type(e).__name__}: {e}')
+					break
 			except Exception as e:
-				self.logger.error(f"Error handling client {client_socket.getpeername()}: {e}")
+				self.logger.error(f'Error handling client {client_socket.getpeername()}: {type(e).__name__}: {e}')
 		
 		client_socket.close()
 
+# We use this functionality including the append() method to send a request from
+# this node. Since we never need to send a request to one specific node and instead
+# send the request to all nodes, we just need the broadcast function
+# Since these nodes are where we send requests, this is where the timeout stuff
+# happens
 	def connect_to_node(self, remote_host, remote_port):
 		remote_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		remote_socket.connect((remote_host, remote_port))

@@ -25,6 +25,10 @@ runners[0].broadcast_message("Hello from node 0")
 
 time.sleep(5)  # Give some time for messages to be received
 
+runners[2].broadcast_message("Hello from node 2")
+
+time.sleep(10)
+
 # stop the nodes
 for runner in runners:
 	runner.stop()
