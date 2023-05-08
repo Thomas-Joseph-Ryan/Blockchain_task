@@ -1,14 +1,14 @@
-2023-05-08 19:41:21,854 [INFO] Node starting
-2023-05-08 19:41:21,857 [INFO] Server listening on localhost:9000
-2023-05-08 19:41:21,858 [INFO] Connected to localhost:<socket.socket fd=648, family=2, type=1, proto=0, laddr=('127.0.0.1', 53242), raddr=('127.0.0.1', 9001)>
-2023-05-08 19:41:21,858 [INFO] Connected to localhost:<socket.socket fd=724, family=2, type=1, proto=0, laddr=('127.0.0.1', 53243), raddr=('127.0.0.1', 9002)>
-2023-05-08 19:41:21,858 [INFO] Connected to localhost:<socket.socket fd=752, family=2, type=1, proto=0, laddr=('127.0.0.1', 53244), raddr=('127.0.0.1', 9003)>
-2023-05-08 19:41:21,859 [INFO] Connection from ('127.0.0.1', 53245)
-2023-05-08 19:41:21,860 [INFO] Connection from ('127.0.0.1', 53248)
-2023-05-08 19:41:21,860 [INFO] Connection from ('127.0.0.1', 53251)
-2023-05-08 19:41:28,862 [INFO] Received from ('127.0.0.1', 53248): Hello from node 2
-2023-05-08 19:41:28,862 [INFO] Sending response Response: Received Hello from node 2
-2023-05-08 19:41:38,862 [INFO] Stopping server
-2023-05-08 19:41:38,862 [ERROR] Connection failed first time ('127.0.0.1', 53245): RuntimeError: socket connection broken
-2023-05-08 19:41:38,864 [ERROR] Error handling client ('127.0.0.1', 53248): ConnectionResetError: [WinError 10054] An existing connection was forcibly closed by the remote host
-2023-05-08 19:41:38,864 [ERROR] Connection failed first time ('127.0.0.1', 53251): RuntimeError: socket connection broken
+2023-05-08 20:05:44,813 [INFO] Node starting
+2023-05-08 20:05:44,832 [INFO] Server listening on localhost:9000
+2023-05-08 20:05:45,341 [INFO] Connected to localhost:<socket.socket fd=648, family=2, type=1, proto=0, laddr=('127.0.0.1', 52236), raddr=('127.0.0.1', 9001)>
+2023-05-08 20:05:45,341 [INFO] Connected to localhost:<socket.socket fd=764, family=2, type=1, proto=0, laddr=('127.0.0.1', 52237), raddr=('127.0.0.1', 9002)>
+2023-05-08 20:05:45,349 [INFO] Connected to localhost:<socket.socket fd=800, family=2, type=1, proto=0, laddr=('127.0.0.1', 52238), raddr=('127.0.0.1', 9003)>
+2023-05-08 20:05:45,349 [INFO] Connection from ('127.0.0.1', 52239)
+2023-05-08 20:05:45,357 [INFO] Connection from ('127.0.0.1', 52242)
+2023-05-08 20:05:45,357 [INFO] Connection from ('127.0.0.1', 52245)
+2023-05-08 20:05:52,369 [INFO] Received from ('127.0.0.1', 52242): Hello from node 2
+2023-05-08 20:05:52,369 [INFO] Sending response Response: Received Hello from node 2
+2023-05-08 20:06:02,371 [INFO] Stopping server
+2023-05-08 20:06:02,377 [ERROR] Connection failed first time ('127.0.0.1', 52239): RuntimeError: socket connection broken
+2023-05-08 20:06:02,377 [ERROR] Error handling client ('127.0.0.1', 52242): ConnectionResetError: [WinError 10054] An existing connection was forcibly closed by the remote host
+2023-05-08 20:06:02,377 [ERROR] Connection failed first time ('127.0.0.1', 52245): RuntimeError: socket connection broken

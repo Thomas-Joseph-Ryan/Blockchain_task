@@ -1,35 +1,32 @@
-2023-05-08 19:41:21,854 [INFO] Node starting
-2023-05-08 19:41:21,857 [INFO] Server listening on localhost:9002
-2023-05-08 19:41:21,858 [INFO] Connection from ('127.0.0.1', 53243)
-2023-05-08 19:41:21,859 [INFO] Connection from ('127.0.0.1', 53246)
-2023-05-08 19:41:21,860 [INFO] Connected to localhost:<socket.socket fd=856, family=2, type=1, proto=0, laddr=('127.0.0.1', 53248), raddr=('127.0.0.1', 9000)>
-2023-05-08 19:41:21,860 [INFO] Connected to localhost:<socket.socket fd=868, family=2, type=1, proto=0, laddr=('127.0.0.1', 53249), raddr=('127.0.0.1', 9001)>
-2023-05-08 19:41:21,860 [INFO] Connected to localhost:<socket.socket fd=892, family=2, type=1, proto=0, laddr=('127.0.0.1', 53250), raddr=('127.0.0.1', 9003)>
-2023-05-08 19:41:21,860 [INFO] Connection from ('127.0.0.1', 53253)
-2023-05-08 19:41:23,861 [INFO] Received from ('127.0.0.1', 53243): Hello from node 0
-2023-05-08 19:41:23,861 [INFO] Sending response Response: Received Hello from node 0
-2023-05-08 19:41:38,862 [ERROR] Error handling client ('127.0.0.1', 53243): ConnectionResetError: [WinError 10054] An existing connection was forcibly closed by the remote host
-2023-05-08 19:41:38,862 [ERROR] Error handling client ('127.0.0.1', 53243): ConnectionResetError: [WinError 10054] An existing connection was forcibly closed by the remote host
-2023-05-08 19:41:38,862 [ERROR] Error handling client ('127.0.0.1', 53243): ConnectionResetError: [WinError 10054] An existing connection was forcibly closed by the remote host
-2023-05-08 19:41:38,862 [ERROR] Error handling client ('127.0.0.1', 53243): ConnectionResetError: [WinError 10054] An existing connection was forcibly closed by the remote host
-2023-05-08 19:41:38,862 [ERROR] Error handling client ('127.0.0.1', 53243): ConnectionResetError: [WinError 10054] An existing connection was forcibly closed by the remote host
-2023-05-08 19:41:38,862 [ERROR] Error handling client ('127.0.0.1', 53243): ConnectionResetError: [WinError 10054] An existing connection was forcibly closed by the remote host
-2023-05-08 19:41:38,862 [ERROR] Error handling client ('127.0.0.1', 53243): ConnectionResetError: [WinError 10054] An existing connection was forcibly closed by the remote host
-2023-05-08 19:41:38,862 [ERROR] Error handling client ('127.0.0.1', 53243): ConnectionResetError: [WinError 10054] An existing connection was forcibly closed by the remote host
-2023-05-08 19:41:38,862 [ERROR] Error handling client ('127.0.0.1', 53243): ConnectionResetError: [WinError 10054] An existing connection was forcibly closed by the remote host
-2023-05-08 19:41:38,862 [ERROR] Error handling client ('127.0.0.1', 53243): ConnectionResetError: [WinError 10054] An existing connection was forcibly closed by the remote host
-2023-05-08 19:41:38,862 [ERROR] Error handling client ('127.0.0.1', 53243): ConnectionResetError: [WinError 10054] An existing connection was forcibly closed by the remote host
-2023-05-08 19:41:38,862 [ERROR] Error handling client ('127.0.0.1', 53243): ConnectionResetError: [WinError 10054] An existing connection was forcibly closed by the remote host
-2023-05-08 19:41:38,862 [ERROR] Error handling client ('127.0.0.1', 53243): ConnectionResetError: [WinError 10054] An existing connection was forcibly closed by the remote host
-2023-05-08 19:41:38,862 [ERROR] Error handling client ('127.0.0.1', 53243): ConnectionResetError: [WinError 10054] An existing connection was forcibly closed by the remote host
-2023-05-08 19:41:38,862 [ERROR] Error handling client ('127.0.0.1', 53243): ConnectionResetError: [WinError 10054] An existing connection was forcibly closed by the remote host
-2023-05-08 19:41:38,862 [ERROR] Error handling client ('127.0.0.1', 53243): ConnectionResetError: [WinError 10054] An existing connection was forcibly closed by the remote host
-2023-05-08 19:41:38,862 [ERROR] Error handling client ('127.0.0.1', 53243): ConnectionResetError: [WinError 10054] An existing connection was forcibly closed by the remote host
-2023-05-08 19:41:38,862 [ERROR] Error handling client ('127.0.0.1', 53243): ConnectionResetError: [WinError 10054] An existing connection was forcibly closed by the remote host
-2023-05-08 19:41:38,862 [ERROR] Error handling client ('127.0.0.1', 53243): ConnectionResetError: [WinError 10054] An existing connection was forcibly closed by the remote host
-2023-05-08 19:41:38,862 [ERROR] Error handling client ('127.0.0.1', 53243): ConnectionResetError: [WinError 10054] An existing connection was forcibly closed by the remote host
-2023-05-08 19:41:38,864 [ERROR] Connection failed first time ('127.0.0.1', 53246): RuntimeError: socket connection broken
-2023-05-08 19:41:38,864 [INFO] Stopping server
-2023-05-08 19:41:38,864 [ERROR] Error handling client ('127.0.0.1', 53243): ConnectionResetError: [WinError 10054] An existing connection was forcibly closed by the remote host
-2023-05-08 19:41:38,864 [ERROR] Connection failed second time, closing connection ('127.0.0.1', 53246): RuntimeError: socket connection broken
-2023-05-08 19:41:38,865 [ERROR] Connection failed first time ('127.0.0.1', 53253): RuntimeError: socket connection broken
+2023-05-08 20:05:44,813 [INFO] Node starting
+2023-05-08 20:05:44,832 [INFO] Server listening on localhost:9002
+2023-05-08 20:05:45,341 [INFO] Connection from ('127.0.0.1', 52237)
+2023-05-08 20:05:45,349 [INFO] Connection from ('127.0.0.1', 52240)
+2023-05-08 20:05:45,357 [INFO] Connected to localhost:<socket.socket fd=844, family=2, type=1, proto=0, laddr=('127.0.0.1', 52242), raddr=('127.0.0.1', 9000)>
+2023-05-08 20:05:45,357 [INFO] Connected to localhost:<socket.socket fd=888, family=2, type=1, proto=0, laddr=('127.0.0.1', 52243), raddr=('127.0.0.1', 9001)>
+2023-05-08 20:05:45,357 [INFO] Connected to localhost:<socket.socket fd=864, family=2, type=1, proto=0, laddr=('127.0.0.1', 52244), raddr=('127.0.0.1', 9003)>
+2023-05-08 20:05:45,365 [INFO] Connection from ('127.0.0.1', 52247)
+2023-05-08 20:05:47,367 [INFO] Received from ('127.0.0.1', 52237): Hello from node 0
+2023-05-08 20:05:47,367 [INFO] Sending response Response: Received Hello from node 0
+2023-05-08 20:06:02,371 [ERROR] Error handling client ('127.0.0.1', 52237): ConnectionResetError: [WinError 10054] An existing connection was forcibly closed by the remote host
+2023-05-08 20:06:02,371 [ERROR] Error handling client ('127.0.0.1', 52237): ConnectionResetError: [WinError 10054] An existing connection was forcibly closed by the remote host
+2023-05-08 20:06:02,371 [ERROR] Error handling client ('127.0.0.1', 52237): ConnectionResetError: [WinError 10054] An existing connection was forcibly closed by the remote host
+2023-05-08 20:06:02,371 [ERROR] Error handling client ('127.0.0.1', 52237): ConnectionResetError: [WinError 10054] An existing connection was forcibly closed by the remote host
+2023-05-08 20:06:02,371 [ERROR] Error handling client ('127.0.0.1', 52237): ConnectionResetError: [WinError 10054] An existing connection was forcibly closed by the remote host
+2023-05-08 20:06:02,371 [ERROR] Error handling client ('127.0.0.1', 52237): ConnectionResetError: [WinError 10054] An existing connection was forcibly closed by the remote host
+2023-05-08 20:06:02,371 [ERROR] Error handling client ('127.0.0.1', 52237): ConnectionResetError: [WinError 10054] An existing connection was forcibly closed by the remote host
+2023-05-08 20:06:02,371 [ERROR] Error handling client ('127.0.0.1', 52237): ConnectionResetError: [WinError 10054] An existing connection was forcibly closed by the remote host
+2023-05-08 20:06:02,371 [ERROR] Error handling client ('127.0.0.1', 52237): ConnectionResetError: [WinError 10054] An existing connection was forcibly closed by the remote host
+2023-05-08 20:06:02,371 [ERROR] Error handling client ('127.0.0.1', 52237): ConnectionResetError: [WinError 10054] An existing connection was forcibly closed by the remote host
+2023-05-08 20:06:02,371 [ERROR] Error handling client ('127.0.0.1', 52237): ConnectionResetError: [WinError 10054] An existing connection was forcibly closed by the remote host
+2023-05-08 20:06:02,371 [ERROR] Error handling client ('127.0.0.1', 52237): ConnectionResetError: [WinError 10054] An existing connection was forcibly closed by the remote host
+2023-05-08 20:06:02,371 [ERROR] Error handling client ('127.0.0.1', 52237): ConnectionResetError: [WinError 10054] An existing connection was forcibly closed by the remote host
+2023-05-08 20:06:02,371 [ERROR] Error handling client ('127.0.0.1', 52237): ConnectionResetError: [WinError 10054] An existing connection was forcibly closed by the remote host
+2023-05-08 20:06:02,371 [ERROR] Error handling client ('127.0.0.1', 52237): ConnectionResetError: [WinError 10054] An existing connection was forcibly closed by the remote host
+2023-05-08 20:06:02,371 [ERROR] Error handling client ('127.0.0.1', 52237): ConnectionResetError: [WinError 10054] An existing connection was forcibly closed by the remote host
+2023-05-08 20:06:02,371 [ERROR] Error handling client ('127.0.0.1', 52237): ConnectionResetError: [WinError 10054] An existing connection was forcibly closed by the remote host
+2023-05-08 20:06:02,371 [ERROR] Error handling client ('127.0.0.1', 52237): ConnectionResetError: [WinError 10054] An existing connection was forcibly closed by the remote host
+2023-05-08 20:06:02,377 [INFO] Stopping server
+2023-05-08 20:06:02,377 [ERROR] Connection failed first time ('127.0.0.1', 52240): RuntimeError: socket connection broken
+2023-05-08 20:06:02,377 [ERROR] Error handling client ('127.0.0.1', 52237): ConnectionResetError: [WinError 10054] An existing connection was forcibly closed by the remote host
+2023-05-08 20:06:02,377 [ERROR] Connection failed first time ('127.0.0.1', 52247): RuntimeError: socket connection broken
