@@ -59,9 +59,9 @@ class ServerRunner():
 
 		self.consensusround_block : dict = {}
 
-		self.consensusround_proposedblocks : dict[int, set] = {}
+		self.consensusround_proposedblocks : dict[int, list[dict]] = {}
 
-		self.current_round = 0
+		self.current_round = 1
 
 		self.stop_event = threading.Event()
 		self.blockchain_lock = threading.Lock()
@@ -158,8 +158,9 @@ class ServerRunner():
 				elif received_dict["type"] == "values":
 					# Send block proposal at that index
 					round = received_dict["payload"]
-					_ = self.propose_block_for_consensus_round(round)
+					self.ensure_block_for_consensus_round(round)
 					proposed_blocks_in_round = self.consensusround_proposedblocks[round]
+					self.logger.info(f"Received request for values in round {round}, they are {proposed_blocks_in_round}")
 					send_prefixed(client_socket, pickle.dumps(proposed_blocks_in_round))
 					if round > self.current_round:
 						self.next_round_request.set()
@@ -208,6 +209,7 @@ class ServerRunner():
 		responses_count = [0] * len(self.remote_nodes)
 		online = [True] * len(self.remote_nodes)
 		for _ in range(self.failure_tolerance+1):
+			self.logger.info(f"Failure tolerence round {_ + 1} commencing")
 			for idx, remote_node in enumerate(self.remote_nodes):
 				# If node is deemed as crashed during this consensus round, we do not try to contact it
 				if online[idx] == False:
@@ -219,19 +221,24 @@ class ServerRunner():
 					try:
 						send_prefixed(remote_node, pickle.dumps(request))
 						response = pickle.loads(recv_prefixed(remote_node))
-						self.logger.info(f"Received response: {response}")
 						break
 					except socket.timeout as e:
+						self.logger.info(f"Remote node {remote_node} failed once")
 						fail_count += 1
 					except RuntimeError as e:
+						self.logger.info(f"Remote node {remote_node} failed twice and will not be contacted for the rest of this round")
 						fail_count += 1
 				if fail_count >= 2:
 					online[idx] = False
 				if response != None:
-					self.consensusround_proposedblocks[round].update(response)
+					self.logger.info(f"Received response: {response}")
+					for block in response:
+						if block not in self.consensusround_proposedblocks[round]:
+							self.consensusround_proposedblocks[round].append(block)
 					responses_count[idx] += 1
 		can_decide = responses_count.count(self.failure_tolerance + 1) >= len(self.remote_nodes) - self.failure_tolerance
 		if can_decide == False:
+			self.logger.info(f"Not enough responses for a decision to be made")
 			return None
 		min_hash_block = proposed_block
 		min_hash = proposed_block["current_hash"]
@@ -244,6 +251,7 @@ class ServerRunner():
 				min_hash = current_hash
 				min_hash_block = block
 		
+		self.logger.info(f"Decided on {min_hash_block}")
 		return min_hash_block
 		
 
@@ -280,20 +288,15 @@ class ServerRunner():
 			self.logger.debug(f"Transaction failed to validate {e}")
 			return False
 
-	def propose_block_for_consensus_round(self, round: int):
+	def ensure_block_for_consensus_round(self, round: int):
     # Check if a block has already been proposed for the given round
-		if round in self.consensusround_block:
-			# If yes, return the previously proposed block
-			proposed_block = self.consensusround_block[round]
-		else:
-			# If not, create a new block proposal
+		if round not in self.consensusround_block:
 			proposed_block = self.blockchain.propose_new_block()
-
+			self.logger.info(f"Ensuring block present for consensus round {proposed_block}")
 			# Store the new block proposal for the given round
 			self.consensusround_block[round] = proposed_block
-			self.consensusround_proposedblocks[round] = set(proposed_block)
+			self.consensusround_proposedblocks[round] = [proposed_block]
 
-		return proposed_block
 
 
 	def pipeline(self):
@@ -314,12 +317,13 @@ class ServerRunner():
 				if result == False:
 					continue
 			time.sleep(2.5)
+			self.current_round += 1
 
 		#2.
 		#With the transactions received from the previous step, 
 		#Create a block proposal based on the current blockchain
 			with self.blockchain_lock:
-				propsed_block = self.propose_block_for_consensus_round(self.current_round)
+				self.ensure_block_for_consensus_round(self.current_round)
 
 		#3.
 		#Start the consensus broadcast routine.
@@ -330,7 +334,7 @@ class ServerRunner():
 		#Contacted in future rounds
 		#The block chosen to be accepted is the one whose hash has the lowest
 		#lexigraphical value
-			block_to_commit = self.consensus_broadcast_routine(propsed_block, self.current_round)
+			block_to_commit = self.consensus_broadcast_routine(self.consensusround_block[self.current_round], self.current_round)
 
 		#4.
 		#Once the block proposal is accepted, append the block
@@ -343,9 +347,10 @@ class ServerRunner():
 		#from the block since they became invalid and cannot be comitted.
 			with self.blockchain_lock:
 				self.blockchain.commit_block(block_to_commit)
-
-			self.current_round += 1
-
+				if len(self.blockchain.pool) == 0:
+					self.pool_non_empty.clear()
+			if self.current_round + 1 not in self.consensusround_block:
+				self.next_round_request.clear()
 
 # For the pool
 
