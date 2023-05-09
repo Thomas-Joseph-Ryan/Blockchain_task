@@ -1,27 +1,10 @@
-2023-05-08 20:05:44,813 [INFO] Node starting
-2023-05-08 20:05:44,832 [INFO] Server listening on localhost:9003
-2023-05-08 20:05:45,349 [INFO] Connection from ('127.0.0.1', 52238)
-2023-05-08 20:05:45,357 [INFO] Connection from ('127.0.0.1', 52241)
-2023-05-08 20:05:45,357 [INFO] Connection from ('127.0.0.1', 52244)
-2023-05-08 20:05:45,357 [INFO] Connected to localhost:<socket.socket fd=872, family=2, type=1, proto=0, laddr=('127.0.0.1', 52245), raddr=('127.0.0.1', 9000)>
-2023-05-08 20:05:45,365 [INFO] Connected to localhost:<socket.socket fd=960, family=2, type=1, proto=0, laddr=('127.0.0.1', 52246), raddr=('127.0.0.1', 9001)>
-2023-05-08 20:05:45,365 [INFO] Connected to localhost:<socket.socket fd=940, family=2, type=1, proto=0, laddr=('127.0.0.1', 52247), raddr=('127.0.0.1', 9002)>
-2023-05-08 20:05:47,367 [INFO] Received from ('127.0.0.1', 52238): Hello from node 0
-2023-05-08 20:05:47,367 [INFO] Sending response Response: Received Hello from node 0
-2023-05-08 20:05:52,370 [INFO] Received from ('127.0.0.1', 52244): Hello from node 2
-2023-05-08 20:05:52,371 [INFO] Sending response Response: Received Hello from node 2
-2023-05-08 20:06:02,371 [ERROR] Error handling client ('127.0.0.1', 52238): ConnectionResetError: [WinError 10054] An existing connection was forcibly closed by the remote host
-2023-05-08 20:06:02,371 [ERROR] Error handling client ('127.0.0.1', 52238): ConnectionResetError: [WinError 10054] An existing connection was forcibly closed by the remote host
-2023-05-08 20:06:02,371 [ERROR] Error handling client ('127.0.0.1', 52238): ConnectionResetError: [WinError 10054] An existing connection was forcibly closed by the remote host
-2023-05-08 20:06:02,371 [ERROR] Error handling client ('127.0.0.1', 52238): ConnectionResetError: [WinError 10054] An existing connection was forcibly closed by the remote host
-2023-05-08 20:06:02,371 [ERROR] Error handling client ('127.0.0.1', 52238): ConnectionResetError: [WinError 10054] An existing connection was forcibly closed by the remote host
-2023-05-08 20:06:02,371 [ERROR] Error handling client ('127.0.0.1', 52238): ConnectionResetError: [WinError 10054] An existing connection was forcibly closed by the remote host
-2023-05-08 20:06:02,377 [ERROR] Connection failed first time ('127.0.0.1', 52241): RuntimeError: socket connection broken
-2023-05-08 20:06:02,377 [ERROR] Connection failed second time, closing connection ('127.0.0.1', 52241): RuntimeError: socket connection broken
-2023-05-08 20:06:02,377 [ERROR] Error handling client ('127.0.0.1', 52238): ConnectionResetError: [WinError 10054] An existing connection was forcibly closed by the remote host
-2023-05-08 20:06:02,377 [ERROR] Error handling client ('127.0.0.1', 52238): ConnectionResetError: [WinError 10054] An existing connection was forcibly closed by the remote host
-2023-05-08 20:06:02,377 [ERROR] Error handling client ('127.0.0.1', 52238): ConnectionResetError: [WinError 10054] An existing connection was forcibly closed by the remote host
-2023-05-08 20:06:02,377 [ERROR] Error handling client ('127.0.0.1', 52244): ConnectionResetError: [WinError 10054] An existing connection was forcibly closed by the remote host
-2023-05-08 20:06:02,377 [INFO] Stopping server
-2023-05-08 20:06:02,377 [ERROR] Error handling client ('127.0.0.1', 52244): ConnectionResetError: [WinError 10054] An existing connection was forcibly closed by the remote host
-2023-05-08 20:06:02,377 [ERROR] Error handling client ('127.0.0.1', 52238): ConnectionResetError: [WinError 10054] An existing connection was forcibly closed by the remote host
+2023-05-09 15:41:09,433 [INFO] Node starting
+2023-05-09 15:41:09,436 [INFO] Server listening on localhost:9003
+2023-05-09 15:41:09,437 [INFO] Connection from ('127.0.0.1', 57344)
+2023-05-09 15:41:09,438 [INFO] Connection from ('127.0.0.1', 57347)
+2023-05-09 15:41:09,439 [INFO] Connection from ('127.0.0.1', 57350)
+2023-05-09 15:41:09,439 [INFO] Connected to localhost:<socket.socket fd=1068, family=2, type=1, proto=0, laddr=('127.0.0.1', 57351), raddr=('127.0.0.1', 9000)>
+2023-05-09 15:41:09,439 [INFO] Connected to localhost:<socket.socket fd=1080, family=2, type=1, proto=0, laddr=('127.0.0.1', 57352), raddr=('127.0.0.1', 9001)>
+2023-05-09 15:41:09,440 [INFO] Connected to localhost:<socket.socket fd=1104, family=2, type=1, proto=0, laddr=('127.0.0.1', 57353), raddr=('127.0.0.1', 9002)>
+2023-05-09 15:41:11,941 [INFO] Received from ('127.0.0.1', 57344): {'type': 'values', 'payload': 0}
+2023-05-09 15:41:11,942 [INFO] Received from ('127.0.0.1', 57344): {'type': 'values', 'payload': 0}

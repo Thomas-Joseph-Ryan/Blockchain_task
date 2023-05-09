@@ -8,17 +8,38 @@ class Blockchain():
         self.pool = []
         self.pool_limit = 3
         self.pubkey_nonce = {}
-        self.new_block('0' * 64)
+        genesis_block = self.propose_new_block('0' * 64)
+        self.commit_block(genesis_block, True)
 
-    def new_block(self, previous_hash=None):
+    def propose_new_block(self, previous_hash=None):
         block = {
             'index': len(self.blockchain) + 1,
             'transactions': self.pool.copy(),
             'previous_hash': previous_hash or self.blockchain[-1]['current_hash'],
         }
         block['current_hash'] = self.calculate_hash(block)
-        self.pool = []
+        return block
+    
+    def commit_block(self, block, genesis=False):
+        # Remove transactions from pool that are being committed
+        committed_transactions = block["transactions"]
+        for commited_transaction in committed_transactions:
+            # I think this for loop is not actually needed because
+            # the nonce will be out of date if it is updated, however
+            # not 100% so not going to do it.
+            for transaction in self.pool:
+                if commited_transaction == transaction:
+                    self.pool.remove(transaction)
+            pub_key = commited_transaction["sender"]
+            self.pubkey_nonce[pub_key] = commited_transaction["nonce"]
+        
+        # Remove transactions from pool that have nonces that are now out of date
+        for transaction in self.pool:
+            self.check_nonce(transaction["sender"], transaction["nonce"])
+
         self.blockchain.append(block)
+        if not genesis:
+            self.on_new_block(block)
 
     def last_block(self):
         return self.blockchain[-1]
@@ -38,6 +59,9 @@ class Blockchain():
             self.pool.append(transaction)
             return True
         return False
+    
+    # def get_block_at_index(self, index):
+    #     if index
     
     def check_nonce(self, pub_key, nonce):
         if pub_key in self.pubkey_nonce:

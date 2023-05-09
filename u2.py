@@ -18,16 +18,14 @@ for i, runner in enumerate(runners):
 		if i != j:
 			runner.append(RemoteNode('localhost', 9000 + j))
 
-time.sleep(2)  # Give the nodes time to connect
+# create clients to send transactions
+clients = [RemoteNode('localhost', 9000 + i) for i in range(4)]
 
-    # Broadcast a message from the first node
-runners[0].broadcast_message("Hello from node 0")
+# create a transaction
+transaction = make_transaction('hello', private_key, 0)
 
-time.sleep(5)  # Give some time for messages to be received
-
-runners[2].broadcast_message("Hello from node 2")
-
-time.sleep(10)
+# send the transaction
+assert(clients[0].transaction(transaction) == True)
 
 # stop the nodes
 for runner in runners:
