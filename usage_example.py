@@ -3,6 +3,7 @@ import threading
 
 # private key for transactions
 private_key = ed25519.Ed25519PrivateKey.from_private_bytes(bytes.fromhex('6dee02b55d8914c145568cb3f3b84586ead2a85910f5b062d7f3f29ddcb4c7aa'))
+private_key2 = ed25519.Ed25519PrivateKey.from_private_bytes(bytes.fromhex('6d1e02b55d8914c145568cb3f3b84586ead2a85910f5b062d7f3f29ddcb4c7aa'))
 
 # create nodes
 runners = [ServerRunner('localhost', 9000 + i, f=1) for i in range(4)]
@@ -23,6 +24,8 @@ clients = [RemoteNode('localhost', 9000 + i) for i in range(4)]
 # create a transaction
 transaction = make_transaction('hello', private_key, 0)
 
+transaction2 = make_transaction('howareyou', private_key, 1)
+
 # set block callback
 lock = threading.Lock()
 cond = threading.Condition(lock)
@@ -36,6 +39,9 @@ for runner in runners:
 
 # send the transaction
 assert(clients[0].transaction(transaction) == True)
+
+runners[2].stop()
+runners.remove(runners[2])
 
 # wait for the block from all nodes
 with lock:

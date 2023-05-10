@@ -31,11 +31,14 @@ class Blockchain():
                 if commited_transaction == transaction:
                     self.pool.remove(transaction)
             pub_key = commited_transaction["sender"]
+            nonce = commited_transaction["nonce"]
             self.pubkey_nonce[pub_key] = commited_transaction["nonce"]
+            # print(f"Pubkey {pub_key}, Nonce {nonce}")
         
         # Remove transactions from pool that have nonces that are now out of date
         for transaction in self.pool:
-            self.check_nonce(transaction["sender"], transaction["nonce"])
+            if not self.check_nonce(transaction["sender"], transaction["nonce"]):
+                self.pool.remove(transaction)
 
         self.blockchain.append(block)
         if not genesis:
@@ -60,12 +63,10 @@ class Blockchain():
             return True
         return False
     
-    # def get_block_at_index(self, index):
-    #     if index
-    
     def check_nonce(self, pub_key, nonce):
+
         if pub_key in self.pubkey_nonce:
-            if self.pubkey_nonce[pub_key] == nonce:
+            if self.pubkey_nonce[pub_key] + 1 == nonce:
                 return True
             else:
                 return False

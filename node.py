@@ -2,11 +2,11 @@ from blockchain import *
 import queue
 import threading
 import socket
-import pickle
 import cryptography.hazmat.primitives.asymmetric.ed25519 as ed25519
 import logging
 from network import *
 import time
+import json
 
 def transaction_bytes(transaction: dict):
 	return json.dumps({k: transaction.get(k) for k in ['sender', 'message', 'nonce']},
@@ -40,7 +40,7 @@ class RemoteNode():
 		#Need to wait for response from server runner saying transaction is valid or invalid
 		with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
 			s.connect((self.host, self.port))
-			send_prefixed(s, pickle.dumps(packet))
+			send_prefixed(s, json.dumps(packet).encode())
 			recv = recv_prefixed(s).decode('utf-8')
 			# print(f"received: {recv}")
 			if recv == "true":
@@ -61,7 +61,7 @@ class ServerRunner():
 
 		self.consensusround_proposedblocks : dict[int, list[dict]] = {}
 
-		self.current_round = 1
+		self.current_round = 0
 
 		self.stop_event = threading.Event()
 		self.blockchain_lock = threading.Lock()
@@ -124,15 +124,15 @@ class ServerRunner():
 		client_socket.settimeout(3)
 		while not self.stop_event.is_set():
 			try:
-				data = recv_prefixed(client_socket)
+				data = recv_prefixed(client_socket).decode()
 				if not data: 
 					break
 				conn_failed = False
-				received_dict = pickle.loads(data)			
+				received_dict = json.loads(data)			
 				self.logger.info(f"Received from {client_socket.getpeername()}: {received_dict}")
 				# So we have the socket here, so when we get a request from
 				# a client we can use this socket (i think)
-				# The messages received will always be a pickle'd dictionary
+				# The messages received will always be a json_dump'd dictionary
 				# of the form {"type": x, "payload": x}
 				if received_dict["type"] == "transaction":
 					# Validate transaction
@@ -151,7 +151,7 @@ class ServerRunner():
 							with self.s1_cond_lock:
 								self.pipeline_s1_wait_cond.notify()
 					else:
-						self.logger.info(f"Invalid transaction received {valid_transaction}")
+						self.logger.info(f"Invalid transaction received")
 
 
 					send_prefixed(client_socket, response.encode('utf-8'))
@@ -161,7 +161,7 @@ class ServerRunner():
 					self.ensure_block_for_consensus_round(round)
 					proposed_blocks_in_round = self.consensusround_proposedblocks[round]
 					self.logger.info(f"Received request for values in round {round}, they are {proposed_blocks_in_round}")
-					send_prefixed(client_socket, pickle.dumps(proposed_blocks_in_round))
+					send_prefixed(client_socket, json.dumps(proposed_blocks_in_round).encode())
 					if round > self.current_round:
 						self.next_round_request.set()
 						with self.s1_cond_lock:
@@ -193,8 +193,6 @@ class ServerRunner():
 		# self.socket_port[remote_socket.getpeername()] = remote_socket
 		self.logger.info(f"Connected to {remote_host}:{remote_socket}")
 		return remote_socket
-	
-	# def try_reconnect_to_node(self, )
 
 	# This method will be used to broadcast a values message
 	def consensus_broadcast_routine(self, proposed_block: dict, round:int):
@@ -214,21 +212,29 @@ class ServerRunner():
 				# If node is deemed as crashed during this consensus round, we do not try to contact it
 				if online[idx] == False:
 					continue
-				remote_node.settimeout(5)
+				try:
+					remote_node.settimeout(5)
+				except OSError:
+					self.logger.error("Remote node is closed as .settimeout could not be set. Reporting node as offline")
+					online[idx] = False
+					continue
 				fail_count = 0
 				response = None
 				while fail_count < 2:
 					try:
-						send_prefixed(remote_node, pickle.dumps(request))
-						response = pickle.loads(recv_prefixed(remote_node))
+						self.logger.info(f"Sending request {request}")
+						send_prefixed(remote_node, json.dumps(request).encode())
+						self.logger.info(f"Request sucessfully sent")
+						response = json.loads(recv_prefixed(remote_node).decode())
 						break
 					except socket.timeout as e:
 						self.logger.info(f"Remote node {remote_node} failed once")
 						fail_count += 1
-					except RuntimeError as e:
-						self.logger.info(f"Remote node {remote_node} failed twice and will not be contacted for the rest of this round")
+					except (RuntimeError, ConnectionResetError, ConnectionRefusedError, ConnectionAbortedError) as e:
+						self.logger.info(f"Remote node {remote_node} failed once")
 						fail_count += 1
 				if fail_count >= 2:
+					self.logger.info(f"Remote node {remote_node} failed twice and will no longer be contacted")
 					online[idx] = False
 				if response != None:
 					self.logger.info(f"Received response: {response}")
@@ -237,21 +243,28 @@ class ServerRunner():
 							self.consensusround_proposedblocks[round].append(block)
 					responses_count[idx] += 1
 		can_decide = responses_count.count(self.failure_tolerance + 1) >= len(self.remote_nodes) - self.failure_tolerance
+		for idx, node_online in enumerate(online):
+			if not node_online:
+				removed_socket = self.remote_nodes.pop(idx)
+				self.logger.info(f"Removed socket {removed_socket}")
 		if can_decide == False:
 			self.logger.info(f"Not enough responses for a decision to be made")
 			return None
-		min_hash_block = proposed_block
-		min_hash = proposed_block["current_hash"]
+		min_hash_block = None
+		min_hash = None
 		for block in self.consensusround_proposedblocks[round]:
 			if len(block["transactions"]) < 1:
 				continue
 
 			current_hash = block["current_hash"]
+			if min_hash == None:
+				min_hash = current_hash
+				min_hash_block = block
 			if current_hash < min_hash:
 				min_hash = current_hash
 				min_hash_block = block
 		
-		self.logger.info(f"Decided on {min_hash_block}")
+		self.logger.info(f"Round {self.current_round} Decided on {min_hash_block}")
 		return min_hash_block
 		
 
@@ -259,33 +272,38 @@ class ServerRunner():
 		str_keys = ['sender','message', 'signature']
 		try:
 			if type(transaction) is not dict:
-				self.logger.debug(f"Error when validating transaction: payload is not a dict: {transaction}")
+				self.logger.error(f"Error when validating transaction: payload is not a dict: {transaction}")
 				return False
 			if len(transaction) != 4:
-				self.logger.debug(f"Error when validating transaction: incorrect number of keys: {transaction}")
+				self.logger.error(f"Error when validating transaction: incorrect number of keys: {transaction}")
 				return False
 			for key in str_keys:
 				if not isinstance(transaction[key], str):
-					self.logger.debug("Error when validating transaction: incorrect value types in dict")
+					self.logger.error("Error when validating transaction: incorrect value types in dict")
 					return False
 			
 			if not isinstance(transaction["nonce"], int):
-				self.logger.debug("Error when validating transaction: incorrect value in dict")
+				self.logger.error("Error when validating transaction: incorrect value in dict")
 				return False
 			pub_key_hex = transaction['sender']
-			if self.blockchain.check_nonce(pub_key_hex, transaction['nonce']) == False:
-				self.logger.debug("Error when validating transaction: Nonce is not valid for key")
-				return False
+			with self.blockchain_lock:
+				for in_pool_transaction in self.blockchain.pool:
+					if transaction["sender"] == in_pool_transaction["sender"] and transaction["nonce"] == in_pool_transaction["nonce"]:
+						self.logger.error(f"There is already a transaction in the pool from this sender with this nonce")
+						return False
+				if self.blockchain.check_nonce(pub_key_hex, transaction['nonce']) == False:
+					self.logger.error(f"Error when validating transaction: Nonce is not valid for key {pub_key_hex}")
+					return False
 			public_key = ed25519.Ed25519PublicKey.from_public_bytes(bytes.fromhex(pub_key_hex))
 
 			if len(transaction['message']) > 70 or not transaction['message'].isalnum():
-				self.logger.debug("Error when validating transaction: message length > 70 or is not alnum")
+				self.logger.error("Error when validating transaction: message length > 70 or is not alnum")
 				return False
 			
 			public_key.verify(bytes.fromhex(transaction['signature']), transaction_bytes(transaction))
 			return True
 		except Exception as e:
-			self.logger.debug(f"Transaction failed to validate {e}")
+			self.logger.error(f"Transaction failed to validate {e}")
 			return False
 
 	def ensure_block_for_consensus_round(self, round: int):
@@ -296,8 +314,6 @@ class ServerRunner():
 			# Store the new block proposal for the given round
 			self.consensusround_block[round] = proposed_block
 			self.consensusround_proposedblocks[round] = [proposed_block]
-
-
 
 	def pipeline(self):
 		#1.
@@ -335,6 +351,10 @@ class ServerRunner():
 		#The block chosen to be accepted is the one whose hash has the lowest
 		#lexigraphical value
 			block_to_commit = self.consensus_broadcast_routine(self.consensusround_block[self.current_round], self.current_round)
+			# print(block_to_commit)
+
+			if block_to_commit == None:
+				continue
 
 		#4.
 		#Once the block proposal is accepted, append the block
@@ -346,21 +366,14 @@ class ServerRunner():
 		#transactions that conflict with it should be removed
 		#from the block since they became invalid and cannot be comitted.
 			with self.blockchain_lock:
+
+				# print(f"Before {self.blockchain.pool}")
 				self.blockchain.commit_block(block_to_commit)
+				# print(f"AFter {self.blockchain.pool}")
 				if len(self.blockchain.pool) == 0:
 					self.pool_non_empty.clear()
 			if self.current_round + 1 not in self.consensusround_block:
 				self.next_round_request.clear()
 
-# For the pool
 
-
-# 
-# Add transactions to the pool once they are validated
-# Propose a block with the transactions in your pool
-# Only remove transactions from the pool once they are committed 
-# in a block
-# 
-# 
-# Validate transaction pool each time a block gets committed
-# 
+# List clearing for some reason
