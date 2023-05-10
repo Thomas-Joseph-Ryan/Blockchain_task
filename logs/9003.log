@@ -1,0 +1,51 @@
+2023-05-10 22:51:34,172 [INFO] Node starting
+2023-05-10 22:51:34,187 [INFO] Server listening on localhost:9003
+2023-05-10 22:51:34,187 [INFO] Connection from ('127.0.0.1', 52276)
+2023-05-10 22:51:34,187 [INFO] Connection from ('127.0.0.1', 52282)
+2023-05-10 22:51:34,203 [INFO] Connection from ('127.0.0.1', 52288)
+2023-05-10 22:51:34,203 [INFO] Connected to localhost:<socket.socket fd=1448, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0, laddr=('127.0.0.1', 52292), raddr=('127.0.0.1', 9000)>
+2023-05-10 22:51:34,208 [INFO] Connected to localhost:<socket.socket fd=1524, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0, laddr=('127.0.0.1', 52293), raddr=('127.0.0.1', 9001)>
+2023-05-10 22:51:34,208 [INFO] Connected to localhost:<socket.socket fd=1444, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0, laddr=('127.0.0.1', 52294), raddr=('127.0.0.1', 9002)>
+2023-05-10 22:51:34,208 [INFO] Connected to localhost:<socket.socket fd=1556, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0, laddr=('127.0.0.1', 52295), raddr=('127.0.0.1', 9004)>
+2023-05-10 22:51:34,208 [INFO] Connected to localhost:<socket.socket fd=1592, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0, laddr=('127.0.0.1', 52296), raddr=('127.0.0.1', 9005)>
+2023-05-10 22:51:34,208 [INFO] Connected to localhost:<socket.socket fd=1588, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0, laddr=('127.0.0.1', 52297), raddr=('127.0.0.1', 9006)>
+2023-05-10 22:51:34,208 [INFO] Connection from ('127.0.0.1', 52301)
+2023-05-10 22:51:34,208 [INFO] Connection from ('127.0.0.1', 52307)
+2023-05-10 22:51:34,219 [INFO] Connection from ('127.0.0.1', 52313)
+2023-05-10 22:51:34,219 [ERROR] Connection failed first time ('127.0.0.1', 52288): RuntimeError: socket connection broken
+2023-05-10 22:51:34,219 [ERROR] Connection failed second time, closing connection ('127.0.0.1', 52288): RuntimeError: socket connection broken
+2023-05-10 22:51:36,726 [INFO] Received from ('127.0.0.1', 52276): {'type': 'values', 'payload': 1}
+2023-05-10 22:51:36,726 [INFO] Ensuring block present for consensus round {'index': 2, 'transactions': [], 'previous_hash': '03525042c7132a2ec3db14b7aa1db816e61f1311199ae2a31f3ad1c4312047d1', 'current_hash': 'ebe1c682b8618d34d9e39ef6384ff9cf62fb77de55b1986728e1034c30eb4abd'}
+2023-05-10 22:51:36,726 [INFO] Received request for values in round 1, they are [{'index': 2, 'transactions': [], 'previous_hash': '03525042c7132a2ec3db14b7aa1db816e61f1311199ae2a31f3ad1c4312047d1', 'current_hash': 'ebe1c682b8618d34d9e39ef6384ff9cf62fb77de55b1986728e1034c30eb4abd'}]
+2023-05-10 22:51:36,742 [INFO] Received from ('127.0.0.1', 52276): {'type': 'values', 'payload': 1}
+2023-05-10 22:51:36,742 [INFO] Received request for values in round 1, they are [{'index': 2, 'transactions': [], 'previous_hash': '03525042c7132a2ec3db14b7aa1db816e61f1311199ae2a31f3ad1c4312047d1', 'current_hash': 'ebe1c682b8618d34d9e39ef6384ff9cf62fb77de55b1986728e1034c30eb4abd'}]
+2023-05-10 22:51:36,742 [INFO] Received from ('127.0.0.1', 52276): {'type': 'values', 'payload': 1}
+2023-05-10 22:51:36,742 [INFO] Received request for values in round 1, they are [{'index': 2, 'transactions': [], 'previous_hash': '03525042c7132a2ec3db14b7aa1db816e61f1311199ae2a31f3ad1c4312047d1', 'current_hash': 'ebe1c682b8618d34d9e39ef6384ff9cf62fb77de55b1986728e1034c30eb4abd'}]
+2023-05-10 22:51:37,226 [INFO] Stopping server
+2023-05-10 22:51:37,226 [INFO] Connection to remote nodes closed
+2023-05-10 22:51:37,226 [INFO] Server thread joined
+2023-05-10 22:51:39,244 [INFO] Entering consensus broadcast routine for round 1
+2023-05-10 22:51:39,244 [INFO] Failure tolerence round 1 commencing
+2023-05-10 22:51:39,244 [ERROR] Remote node is closed as .settimeout could not be set. Reporting node as offline
+2023-05-10 22:51:39,244 [ERROR] Remote node is closed as .settimeout could not be set. Reporting node as offline
+2023-05-10 22:51:39,244 [ERROR] Remote node is closed as .settimeout could not be set. Reporting node as offline
+2023-05-10 22:51:39,244 [ERROR] Remote node is closed as .settimeout could not be set. Reporting node as offline
+2023-05-10 22:51:39,244 [ERROR] Remote node is closed as .settimeout could not be set. Reporting node as offline
+2023-05-10 22:51:39,244 [ERROR] Remote node is closed as .settimeout could not be set. Reporting node as offline
+2023-05-10 22:51:39,244 [INFO] Failure tolerence round 2 commencing
+2023-05-10 22:51:39,244 [INFO] Failure tolerence round 3 commencing
+2023-05-10 22:51:39,244 [INFO] Removed socket <socket.socket [closed] fd=-1, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0>
+2023-05-10 22:51:39,244 [INFO] Removed socket <socket.socket [closed] fd=-1, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0>
+2023-05-10 22:51:39,244 [INFO] Removed socket <socket.socket [closed] fd=-1, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0>
+2023-05-10 22:51:39,244 [INFO] Removed socket <socket.socket [closed] fd=-1, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0>
+2023-05-10 22:51:39,244 [INFO] Removed socket <socket.socket [closed] fd=-1, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0>
+2023-05-10 22:51:39,260 [INFO] Removed socket <socket.socket [closed] fd=-1, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0>
+2023-05-10 22:51:39,260 [CRITICAL] Not enough responses for a decision to be made
+2023-05-10 22:51:39,260 [INFO] Pipeline thread joined
+2023-05-10 22:51:39,260 [INFO] Server Stopped
+2023-05-10 22:51:39,276 [INFO] Received from ('127.0.0.1', 52301): {'type': 'values', 'payload': 1}
+2023-05-10 22:51:39,276 [INFO] Received request for values in round 1, they are [{'index': 2, 'transactions': [], 'previous_hash': '03525042c7132a2ec3db14b7aa1db816e61f1311199ae2a31f3ad1c4312047d1', 'current_hash': 'ebe1c682b8618d34d9e39ef6384ff9cf62fb77de55b1986728e1034c30eb4abd'}]
+2023-05-10 22:51:39,276 [INFO] Received from ('127.0.0.1', 52282): {'type': 'values', 'payload': 1}
+2023-05-10 22:51:39,276 [INFO] Received request for values in round 1, they are [{'index': 2, 'transactions': [], 'previous_hash': '03525042c7132a2ec3db14b7aa1db816e61f1311199ae2a31f3ad1c4312047d1', 'current_hash': 'ebe1c682b8618d34d9e39ef6384ff9cf62fb77de55b1986728e1034c30eb4abd'}]
+2023-05-10 22:51:39,291 [INFO] Received from ('127.0.0.1', 52307): {'type': 'values', 'payload': 1}
+2023-05-10 22:51:39,291 [INFO] Received request for values in round 1, they are [{'index': 2, 'transactions': [], 'previous_hash': '03525042c7132a2ec3db14b7aa1db816e61f1311199ae2a31f3ad1c4312047d1', 'current_hash': 'ebe1c682b8618d34d9e39ef6384ff9cf62fb77de55b1986728e1034c30eb4abd'}]

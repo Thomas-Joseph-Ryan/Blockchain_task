@@ -202,21 +202,21 @@ class ServerRunner():
 			"payload": round
 		}
 		if len(self.remote_nodes) < 2*self.failure_tolerance:
-			self.logger.fatal("Number of accepted failures too large relative to number of remote nodes. Quitting")
+			self.logger.fatal("Number of accepted failures too large relative to number of remote nodes. Ending round")
 			return None
 		responses_count = [0] * len(self.remote_nodes)
-		online = [True] * len(self.remote_nodes)
+		failed_nodes = []
 		for _ in range(self.failure_tolerance+1):
 			self.logger.info(f"Failure tolerence round {_ + 1} commencing")
 			for idx, remote_node in enumerate(self.remote_nodes):
 				# If node is deemed as crashed during this consensus round, we do not try to contact it
-				if online[idx] == False:
+				if remote_node in failed_nodes:
 					continue
 				try:
 					remote_node.settimeout(5)
 				except OSError:
 					self.logger.error("Remote node is closed as .settimeout could not be set. Reporting node as offline")
-					online[idx] = False
+					failed_nodes.append(remote_node)
 					continue
 				fail_count = 0
 				response = None
@@ -235,7 +235,7 @@ class ServerRunner():
 						fail_count += 1
 				if fail_count >= 2:
 					self.logger.info(f"Remote node {remote_node} failed twice and will no longer be contacted")
-					online[idx] = False
+					failed_nodes.append(remote_node)
 				if response != None:
 					self.logger.info(f"Received response: {response}")
 					for block in response:
@@ -243,12 +243,11 @@ class ServerRunner():
 							self.consensusround_proposedblocks[round].append(block)
 					responses_count[idx] += 1
 		can_decide = responses_count.count(self.failure_tolerance + 1) >= len(self.remote_nodes) - self.failure_tolerance
-		for idx, node_online in enumerate(online):
-			if not node_online:
-				removed_socket = self.remote_nodes.pop(idx)
-				self.logger.info(f"Removed socket {removed_socket}")
+		for node in failed_nodes:
+			self.remote_nodes.remove(node)
+			self.logger.info(f"Removed socket {node}")
 		if can_decide == False:
-			self.logger.info(f"Not enough responses for a decision to be made")
+			self.logger.critical(f"Not enough responses for a decision to be made")
 			return None
 		min_hash_block = None
 		min_hash = None
@@ -264,7 +263,7 @@ class ServerRunner():
 				min_hash = current_hash
 				min_hash_block = block
 		
-		self.logger.info(f"Round {self.current_round} Decided on {min_hash_block}")
+		self.logger.critical(f"Round {self.current_round} Decided on {min_hash_block}")
 		return min_hash_block
 		
 

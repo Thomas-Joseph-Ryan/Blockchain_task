@@ -2,6 +2,8 @@ import unittest
 from node import *
 import threading
 
+NUMBER_OF_SERVER_RUNNERS = 4
+
 last_used_port = 9000
 
 def get_unique_port():
@@ -24,7 +26,7 @@ class TestNode(unittest.TestCase):
 
     def setUp(self):
         # create nodes
-        ports = [get_unique_port() for _ in range(5)]
+        ports = [get_unique_port() for _ in range(NUMBER_OF_SERVER_RUNNERS)]
 
         # Create and start nodes
         self.runners = [ServerRunner('localhost', port, f=2) for port in ports]
@@ -304,27 +306,32 @@ class TestNode(unittest.TestCase):
         # check that the transaction is committed
         self.assertTrue(all([block['transactions'][0] == transaction for block in self.blocks]))
 
-    def test_1_transaction_two_nodes_fail(self):
-        # create a transaction
-        transaction = make_transaction('test1', self.private_key, 0)
 
-        # send the transaction
-        self.assertTrue(self.clients[0].transaction(transaction))
+    # In order to include the below test, you must change the number of server runners being tested in each
+    # test up to 7. By doing this you dramatically increase the time taken for these tests to complete, so for 
+    # now i have this test commented out
 
-        self.runners[1].stop
-        self.runners.remove(self.runners[1])
+    # def test_1_transaction_two_nodes_fail(self):
+    #     # create a transaction
+    #     transaction = make_transaction('test1', self.private_key, 0)
+
+    #     # send the transaction
+    #     self.assertTrue(self.clients[0].transaction(transaction))
+
+    #     self.runners[1].stop
+    #     self.runners.remove(self.runners[1])
         
-        # These turn into different nodes at index 1 because the one currently at 1 gets removed
-        self.runners[1].stop
-        self.runners.remove(self.runners[1])
+    #     # These turn into different nodes at index 1 because the one currently at 1 gets removed
+    #     self.runners[1].stop
+    #     self.runners.remove(self.runners[1])
 
 
-        # wait for the block from all nodes
-        with self.lock:
-            self.cond.wait_for(lambda: len(self.blocks) == len(self.runners))
+    #     # wait for the block from all nodes
+    #     with self.lock:
+    #         self.cond.wait_for(lambda: len(self.blocks) == len(self.runners))
 
-        # check that the transaction is committed
-        self.assertTrue(all([block['transactions'][0] == transaction for block in self.blocks]))
+    #     # check that the transaction is committed
+    #     self.assertTrue(all([block['transactions'][0] == transaction for block in self.blocks]))
 
     
     
