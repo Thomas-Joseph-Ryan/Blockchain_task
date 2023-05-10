@@ -1,81 +1,4 @@
-import json
-import hashlib
-from typing import Callable
-
-class Blockchain():
-    def  __init__(self):
-        self.blockchain = []
-        self.pool = []
-        self.pool_limit = 3
-        self.pubkey_nonce = {}
-        genesis_block = self.propose_new_block('0' * 64)
-        self.commit_block(genesis_block, True)
-
-    def propose_new_block(self, previous_hash=None):
-        block = {
-            'index': len(self.blockchain) + 1,
-            'transactions': self.pool.copy(),
-            'previous_hash': previous_hash or self.blockchain[-1]['current_hash'],
-        }
-        block['current_hash'] = self.calculate_hash(block)
-        return block
-    
-    def commit_block(self, block, genesis=False):
-        # Remove transactions from pool that are being committed
-        committed_transactions = block["transactions"]
-        for commited_transaction in committed_transactions:
-            # I think this for loop is not actually needed because
-            # the nonce will be out of date if it is updated, however
-            # not 100% so not going to do it.
-            for transaction in self.pool:
-                if commited_transaction == transaction:
-                    self.pool.remove(transaction)
-            pub_key = commited_transaction["sender"]
-            nonce = commited_transaction["nonce"]
-            self.pubkey_nonce[pub_key] = commited_transaction["nonce"]
-            # print(f"Pubkey {pub_key}, Nonce {nonce}")
-        
-        # Remove transactions from pool that have nonces that are now out of date
-        for transaction in self.pool:
-            if not self.check_nonce(transaction["sender"], transaction["nonce"]):
-                self.pool.remove(transaction)
-
-        self.blockchain.append(block)
-        if not genesis:
-            self.on_new_block(block)
-
-    def last_block(self):
-        return self.blockchain[-1]
-
-    def calculate_hash(self, block: dict):
-        block_object: str = json.dumps({k: block.get(k) for k in ['index', 'transactions', 'previous_hash']}, sort_keys=True)
-        block_string = block_object.encode()
-        raw_hash = hashlib.sha256(block_string)
-        hex_hash = raw_hash.hexdigest()
-        return hex_hash
-
-    def set_on_new_block(self, on_new_block: Callable):
-        self.on_new_block = on_new_block
-	
-    def add_transaction(self, transaction):
-        if len(self.pool) < self.pool_limit:
-            self.pool.append(transaction)
-            return True
-        return False
-    
-    def check_nonce(self, pub_key, nonce):
-
-        if pub_key in self.pubkey_nonce:
-            if self.pubkey_nonce[pub_key] + 1 == nonce:
-                return True
-            else:
-                return False
-        else:
-            if nonce == 0:
-                return True
-            return False
-
-  from node import *
+from node import *
 import threading
 
 # private key for transactions
@@ -83,7 +6,7 @@ private_key = ed25519.Ed25519PrivateKey.from_private_bytes(bytes.fromhex('6dee02
 private_key2 = ed25519.Ed25519PrivateKey.from_private_bytes(bytes.fromhex('6d1e02b55d8914c145568cb3f3b84586ead2a85910f5b062d7f3f29ddcb4c7aa'))
 
 # create nodes
-runners = [ServerRunner('localhost', 9000 + i, f=1) for i in range(4)]
+runners = [ServerRunner('localhost', 9000 + i, f=2) for i in range(7)]
 
 # start accepting incoming connections
 for runner in runners:
@@ -91,17 +14,18 @@ for runner in runners:
 
 # connect other nodes
 for i, runner in enumerate(runners):
-	for j in range(4):
+	for j in range(7):
 		if i != j:
 			runner.append(RemoteNode('localhost', 9000 + j))
 
 # create clients to send transactions
-clients = [RemoteNode('localhost', 9000 + i) for i in range(4)]
+clients = [RemoteNode('localhost', 9000 + i) for i in range(7)]
 
 # create a transaction
 transaction = make_transaction('hello', private_key, 0)
 
 transaction2 = make_transaction('howareyou', private_key, 1)
+transaction3 = make_transaction('transaction3', private_key2, 0)
 
 # set block callback
 lock = threading.Lock()
@@ -119,6 +43,10 @@ assert(clients[0].transaction(transaction) == True)
 
 runners[2].stop()
 runners.remove(runners[2])
+clients.remove(clients[2])
+runners[2].stop()
+runners.remove(runners[2])
+clients.remove(clients[2])
 
 # wait for the block from all nodes
 with lock:
@@ -127,6 +55,35 @@ with lock:
 # check that the transaction is committed
 assert(all([block['transactions'][0] == transaction for block in blocks]))
 
+blocks = []
+
+assert(clients[1].transaction(transaction2) == True)
+assert(clients[0].transaction(transaction3) == True)
+
+# wait for the block from all nodes
+with lock:
+	cond.wait_for(lambda: len(blocks) == len(runners))
+
+transaction2_acc = all([block['transactions'][0] == transaction2 for block in blocks])
+
+transaction3_acc = all([block['transactions'][0] == transaction3 for block in blocks])
+
+# check that the transaction is committed
+assert(transaction2_acc or transaction3_acc) == True
+
+blocks = []
+
+with lock:
+	cond.wait_for(lambda: len(blocks) == len(runners))
+
+if not transaction3_acc:
+	transaction3_acc = all([block['transactions'][0] == transaction3 for block in blocks])
+	assert(transaction3_acc) == True
+	
+elif not transaction2_acc:
+	transaction2_acc = all([block['transactions'][0] == transaction2 for block in blocks])
+	assert(transaction2_acc) == True
+
 # stop the nodes
 for runner in runners:
 	runner.stop()
@@ -134,6 +91,8 @@ for runner in runners:
 import unittest
 from node import *
 import threading
+
+NUMBER_OF_SERVER_RUNNERS = 4
 
 last_used_port = 9000
 
@@ -157,7 +116,7 @@ class TestNode(unittest.TestCase):
 
     def setUp(self):
         # create nodes
-        ports = [get_unique_port() for _ in range(5)]
+        ports = [get_unique_port() for _ in range(NUMBER_OF_SERVER_RUNNERS)]
 
         # Create and start nodes
         self.runners = [ServerRunner('localhost', port, f=2) for port in ports]
@@ -437,27 +396,32 @@ class TestNode(unittest.TestCase):
         # check that the transaction is committed
         self.assertTrue(all([block['transactions'][0] == transaction for block in self.blocks]))
 
-    def test_1_transaction_two_nodes_fail(self):
-        # create a transaction
-        transaction = make_transaction('test1', self.private_key, 0)
 
-        # send the transaction
-        self.assertTrue(self.clients[0].transaction(transaction))
+    # In order to include the below test, you must change the number of server runners being tested in each
+    # test up to 7. By doing this you dramatically increase the time taken for these tests to complete, so for 
+    # now i have this test commented out
 
-        self.runners[1].stop
-        self.runners.remove(self.runners[1])
+    # def test_1_transaction_two_nodes_fail(self):
+    #     # create a transaction
+    #     transaction = make_transaction('test1', self.private_key, 0)
+
+    #     # send the transaction
+    #     self.assertTrue(self.clients[0].transaction(transaction))
+
+    #     self.runners[1].stop
+    #     self.runners.remove(self.runners[1])
         
-        # These turn into different nodes at index 1 because the one currently at 1 gets removed
-        self.runners[1].stop
-        self.runners.remove(self.runners[1])
+    #     # These turn into different nodes at index 1 because the one currently at 1 gets removed
+    #     self.runners[1].stop
+    #     self.runners.remove(self.runners[1])
 
 
-        # wait for the block from all nodes
-        with self.lock:
-            self.cond.wait_for(lambda: len(self.blocks) == len(self.runners))
+    #     # wait for the block from all nodes
+    #     with self.lock:
+    #         self.cond.wait_for(lambda: len(self.blocks) == len(self.runners))
 
-        # check that the transaction is committed
-        self.assertTrue(all([block['transactions'][0] == transaction for block in self.blocks]))
+    #     # check that the transaction is committed
+    #     self.assertTrue(all([block['transactions'][0] == transaction for block in self.blocks]))
 
     
     
@@ -669,21 +633,21 @@ class ServerRunner():
 			"payload": round
 		}
 		if len(self.remote_nodes) < 2*self.failure_tolerance:
-			self.logger.fatal("Number of accepted failures too large relative to number of remote nodes. Quitting")
+			self.logger.fatal("Number of accepted failures too large relative to number of remote nodes. Ending round")
 			return None
 		responses_count = [0] * len(self.remote_nodes)
-		online = [True] * len(self.remote_nodes)
+		failed_nodes = []
 		for _ in range(self.failure_tolerance+1):
 			self.logger.info(f"Failure tolerence round {_ + 1} commencing")
 			for idx, remote_node in enumerate(self.remote_nodes):
 				# If node is deemed as crashed during this consensus round, we do not try to contact it
-				if online[idx] == False:
+				if remote_node in failed_nodes:
 					continue
 				try:
 					remote_node.settimeout(5)
 				except OSError:
 					self.logger.error("Remote node is closed as .settimeout could not be set. Reporting node as offline")
-					online[idx] = False
+					failed_nodes.append(remote_node)
 					continue
 				fail_count = 0
 				response = None
@@ -702,7 +666,7 @@ class ServerRunner():
 						fail_count += 1
 				if fail_count >= 2:
 					self.logger.info(f"Remote node {remote_node} failed twice and will no longer be contacted")
-					online[idx] = False
+					failed_nodes.append(remote_node)
 				if response != None:
 					self.logger.info(f"Received response: {response}")
 					for block in response:
@@ -710,12 +674,11 @@ class ServerRunner():
 							self.consensusround_proposedblocks[round].append(block)
 					responses_count[idx] += 1
 		can_decide = responses_count.count(self.failure_tolerance + 1) >= len(self.remote_nodes) - self.failure_tolerance
-		for idx, node_online in enumerate(online):
-			if not node_online:
-				removed_socket = self.remote_nodes.pop(idx)
-				self.logger.info(f"Removed socket {removed_socket}")
+		for node in failed_nodes:
+			self.remote_nodes.remove(node)
+			self.logger.info(f"Removed socket {node}")
 		if can_decide == False:
-			self.logger.info(f"Not enough responses for a decision to be made")
+			self.logger.critical(f"Not enough responses for a decision to be made")
 			return None
 		min_hash_block = None
 		min_hash = None
@@ -731,7 +694,7 @@ class ServerRunner():
 				min_hash = current_hash
 				min_hash_block = block
 		
-		self.logger.info(f"Round {self.current_round} Decided on {min_hash_block}")
+		self.logger.critical(f"Round {self.current_round} Decided on {min_hash_block}")
 		return min_hash_block
 		
 
@@ -842,9 +805,6 @@ class ServerRunner():
 			if self.current_round + 1 not in self.consensusround_block:
 				self.next_round_request.clear()
 
-
-# List clearing for some reason
-
 import socket
 import struct
 
@@ -885,75 +845,79 @@ def send_prefixed(sock: socket.socket, msg: bytes):
 	size_bytes = struct.pack("!H", size)
 	send_exact(sock, size_bytes + msg)
 
+import json
+import hashlib
+from typing import Callable
 
-from node import *
-import threading
+class Blockchain():
+    def  __init__(self):
+        self.blockchain = []
+        self.pool = []
+        self.pool_limit = 3
+        self.pubkey_nonce = {}
+        genesis_block = self.propose_new_block('0' * 64)
+        self.commit_block(genesis_block, True)
 
-# private key for transactions
-private_key = ed25519.Ed25519PrivateKey.from_private_bytes(bytes.fromhex('6d4e02655d8214c145568cb3f3b84586ead2a85910f5b062d7f3f29ddcb4c7aa'))
+    def propose_new_block(self, previous_hash=None):
+        block = {
+            'index': len(self.blockchain) + 1,
+            'transactions': self.pool.copy(),
+            'previous_hash': previous_hash or self.blockchain[-1]['current_hash'],
+        }
+        block['current_hash'] = self.calculate_hash(block)
+        return block
+    
+    def commit_block(self, block, genesis=False):
+        # Remove transactions from pool that are being committed
+        committed_transactions = block["transactions"]
+        for commited_transaction in committed_transactions:
+            # I think this for loop is not actually needed because
+            # the nonce will be out of date if it is updated, however
+            # not 100% so not going to do it.
+            for transaction in self.pool:
+                if commited_transaction == transaction:
+                    self.pool.remove(transaction)
+            pub_key = commited_transaction["sender"]
+            nonce = commited_transaction["nonce"]
+            self.pubkey_nonce[pub_key] = commited_transaction["nonce"]
+            # print(f"Pubkey {pub_key}, Nonce {nonce}")
+        
+        # Remove transactions from pool that have nonces that are now out of date
+        for transaction in self.pool:
+            if not self.check_nonce(transaction["sender"], transaction["nonce"]):
+                self.pool.remove(transaction)
 
-# create nodes
-runners = [ServerRunner('10.19.90.192', 9000, f=0)]
+        self.blockchain.append(block)
+        if not genesis:
+            self.on_new_block(block)
 
-# 10.19.227.141
+    def last_block(self):
+        return self.blockchain[-1]
 
-# start accepting incoming connections
-for runner in runners:
-	runner.start()
+    def calculate_hash(self, block: dict):
+        block_object: str = json.dumps({k: block.get(k) for k in ['index', 'transactions', 'previous_hash']}, sort_keys=True)
+        block_string = block_object.encode()
+        raw_hash = hashlib.sha256(block_string)
+        hex_hash = raw_hash.hexdigest()
+        return hex_hash
+
+    def set_on_new_block(self, on_new_block: Callable):
+        self.on_new_block = on_new_block
 	
-runners[0].append(RemoteNode('10.19.227.141', 9000))
+    def add_transaction(self, transaction):
+        if len(self.pool) < self.pool_limit:
+            self.pool.append(transaction)
+            return True
+        return False
+    
+    def check_nonce(self, pub_key, nonce):
 
-# connect other nodes
-# for i, runner in enumerate(runners):
-# 	for j in range(4):
-# 		if i != j:
-# 			runner.append(RemoteNode('localhost', 9000 + j))
-
-# create clients to send transactions
-clients = [RemoteNode('10.19.90.192', 9000)]
-
-# create a transaction
-transaction = make_transaction('hello', private_key, 0)
-
-transaction2 = make_transaction('howareyou', private_key, 1)
-
-# set block callback
-lock = threading.Lock()
-cond = threading.Condition(lock)
-blocks = []
-def on_new_block(block):
-	with lock:
-		blocks.append(block)
-		cond.notify()
-for runner in runners:
-	runner.blockchain.set_on_new_block(on_new_block)
-
-# send the transaction
-assert(clients[0].transaction(transaction) == True)
-
-# runners[2].stop()
-# runners.pop(2)
-
-# wait for the block from all nodes
-while True:
-    with lock:
-        cond.wait_for(lambda: len(blocks) == len(runners))
-
-# check that the transaction is committed
-# assert(all([block['transactions'][0] == transaction for block in blocks]))
-
-# blocks = []
-
-# assert(clients[1].transaction(transaction2) == True)
-
-# # wait for the block from all nodes
-# with lock:
-# 	cond.wait_for(lambda: len(blocks) == len(runners))
-
-# # check that the transaction is committed
-# assert(all([block['transactions'][0] == transaction2 for block in blocks]))
-
-# stop the nodes
-for runner in runners:
-	runner.stop()
-
+        if pub_key in self.pubkey_nonce:
+            if self.pubkey_nonce[pub_key] + 1 == nonce:
+                return True
+            else:
+                return False
+        else:
+            if nonce == 0:
+                return True
+            return False

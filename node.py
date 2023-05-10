@@ -373,6 +373,3 @@ class ServerRunner():
 					self.pool_non_empty.clear()
 			if self.current_round + 1 not in self.consensusround_block:
 				self.next_round_request.clear()
-
-
-# List clearing for some reason
