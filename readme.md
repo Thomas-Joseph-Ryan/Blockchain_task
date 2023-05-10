@@ -26,3 +26,7 @@ examine each block and what has been accepted inside that block in the log files
 Also, I was told by my tutor today 10/05/2023 that what we upload by friday will not be what is marked but rather what we
 show in our tutorial, so if the tutor would like me to have print statements on that day then I will add them / sub them in 
 for the logging statements
+
+## Plagerism for network.py?
+
+Just including this incase, since network.py was provided to us as a module to use, I am expecting this to show up as potential plagerism with other students
