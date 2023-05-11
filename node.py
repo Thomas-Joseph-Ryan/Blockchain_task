@@ -95,6 +95,7 @@ class ServerRunner():
 		self.pipeline_thread.join()
 		self.logger.info("Pipeline thread joined")
 		self.logger.info("Server Stopped")
+		print(f"{self.port} - Stopping / Simulating crash")
 
 	def append(self, remote_node: RemoteNode):
 		remote_socket = self.connect_to_node(remote_node.host, remote_node.port)
@@ -134,6 +135,7 @@ class ServerRunner():
 				# a client we can use this socket (i think)
 				# The messages received will always be a json_dump'd dictionary
 				# of the form {"type": x, "payload": x}
+				print(f"{self.port} - Received: {received_dict}")
 				if received_dict["type"] == "transaction":
 					# Validate transaction
 					self.logger.info("transaction received")
@@ -145,13 +147,18 @@ class ServerRunner():
 						with self.blockchain_lock:
 							added_to_pool = self.blockchain.add_transaction(transaction)
 						if added_to_pool == True:
+							print(f"{self.port} - Valid transaction received and added to the pool")
 							self.logger.info("Valid transaction was added to pool")
 							response = "true"
-							self.pool_non_empty.set()
+							self.pool_non_empty.set()	
 							with self.s1_cond_lock:
 								self.pipeline_s1_wait_cond.notify()
+						else:
+							print(f"{self.port} - Valid transaction received, but could not be added to the pool")
+
 					else:
 						self.logger.info(f"Invalid transaction received")
+						print(f"{self.port} - Invalid transaction received")
 
 
 					send_prefixed(client_socket, response.encode('utf-8'))
@@ -182,11 +189,7 @@ class ServerRunner():
 		
 		client_socket.close()
 
-# We use this functionality including the append() method to send a request from
-# this node. Since we never need to send a request to one specific node and instead
-# send the request to all nodes, we just need the broadcast function
-# Since these nodes are where we send requests, this is where the timeout stuff
-# happens
+
 	def connect_to_node(self, remote_host, remote_port):
 		remote_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		remote_socket.connect((remote_host, remote_port))
@@ -315,16 +318,6 @@ class ServerRunner():
 			self.consensusround_proposedblocks[round] = [proposed_block]
 
 	def pipeline(self):
-		#1.
-		#Wait for transaction pool to be ready
-		#This can happen when the pool becomes non-empty
-		#or when the node recieves a request from another node
-		#asking for the value of the next round. This only happens when
-		#the remote node has received a transaction and is ready to propose a
-		#non - empty block
-		
-		#After one of these criterions is met, a node should wait for 2.5 seconds
-		#before moving to operation 2
 
 		while not self.stop_event.is_set():
 			with self.s1_cond_lock:
@@ -334,41 +327,19 @@ class ServerRunner():
 			time.sleep(2.5)
 			self.current_round += 1
 
-		#2.
-		#With the transactions received from the previous step, 
-		#Create a block proposal based on the current blockchain
 			with self.blockchain_lock:
 				self.ensure_block_for_consensus_round(self.current_round)
 
-		#3.
-		#Start the consensus broadcast routine.
-		#Request values for the next block id from all other nodes.
-		#The timeout for the response is 5 seonds
-		#If the socket is closed or timeout is reached, retry one time
-		#If retry fails, the node is considered crashed and should not be
-		#Contacted in future rounds
-		#The block chosen to be accepted is the one whose hash has the lowest
-		#lexigraphical value
 			block_to_commit = self.consensus_broadcast_routine(self.consensusround_block[self.current_round], self.current_round)
-			# print(block_to_commit)
+			# print(bl{self.port} - ock_to_commit)
 
 			if block_to_commit == None:
 				continue
 
-		#4.
-		#Once the block proposal is accepted, append the block
-		#to the blockchain and remove the included transactions from
-		#the transaction pool. 
-		#Note: there could be conflicting transactions from 
-		#the same user based on the transaction nonce, the first
-		#of these transactions can be included but any following 
-		#transactions that conflict with it should be removed
-		#from the block since they became invalid and cannot be comitted.
 			with self.blockchain_lock:
 
-				# print(f"Before {self.blockchain.pool}")
 				self.blockchain.commit_block(block_to_commit)
-				# print(f"AFter {self.blockchain.pool}")
+				print(f"{self.port} - New block: {block_to_commit}")
 				if len(self.blockchain.pool) == 0:
 					self.pool_non_empty.clear()
 			if self.current_round + 1 not in self.consensusround_block:
