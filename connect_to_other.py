@@ -5,7 +5,7 @@ import threading
 private_key = ed25519.Ed25519PrivateKey.from_private_bytes(bytes.fromhex('6d4e02655d8214c145568cb3f3b84586ead2a85910f5b062d7f3f29ddcb4c7aa'))
 
 # create nodes
-runners = [ServerRunner('10.19.90.192', 9000, f=0)]
+runners = [ServerRunner('10.48.65.35', 9000, f=0)]
 
 # 10.19.227.141
 
@@ -13,7 +13,7 @@ runners = [ServerRunner('10.19.90.192', 9000, f=0)]
 for runner in runners:
 	runner.start()
 	
-runners[0].append(RemoteNode('10.19.227.141', 9000))
+runners[0].append(RemoteNode('10.48.65.59', 9000))
 
 # connect other nodes
 # for i, runner in enumerate(runners):
@@ -22,10 +22,10 @@ runners[0].append(RemoteNode('10.19.227.141', 9000))
 # 			runner.append(RemoteNode('localhost', 9000 + j))
 
 # create clients to send transactions
-clients = [RemoteNode('10.19.90.192', 9000)]
+clients = [RemoteNode('10.48.65.35', 9000)]
 
 # create a transaction
-transaction = make_transaction('hello', private_key, 0)
+transaction = make_transaction('hellofromtom', private_key, 0)
 
 transaction2 = make_transaction('howareyou', private_key, 1)
 

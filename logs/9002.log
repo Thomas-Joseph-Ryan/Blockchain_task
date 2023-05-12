@@ -1,22 +1,22 @@
-2023-05-12 08:01:08,964 [INFO] Node starting
-2023-05-12 08:01:08,980 [INFO] Server listening on localhost:9002
-2023-05-12 08:01:08,980 [INFO] Connection from ('127.0.0.1', 55092)
-2023-05-12 08:01:08,990 [INFO] Connection from ('127.0.0.1', 55098)
-2023-05-12 08:01:08,990 [INFO] Connected to localhost:<socket.socket fd=1416, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0, laddr=('127.0.0.1', 55103), raddr=('127.0.0.1', 9000)>
-2023-05-12 08:01:08,990 [INFO] Connected to localhost:<socket.socket fd=1424, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0, laddr=('127.0.0.1', 55104), raddr=('127.0.0.1', 9001)>
-2023-05-12 08:01:08,996 [INFO] Connected to localhost:<socket.socket fd=1440, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0, laddr=('127.0.0.1', 55105), raddr=('127.0.0.1', 9003)>
-2023-05-12 08:01:08,996 [INFO] Connected to localhost:<socket.socket fd=1448, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0, laddr=('127.0.0.1', 55106), raddr=('127.0.0.1', 9004)>
-2023-05-12 08:01:08,996 [INFO] Connected to localhost:<socket.socket fd=1484, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0, laddr=('127.0.0.1', 55107), raddr=('127.0.0.1', 9005)>
-2023-05-12 08:01:08,996 [INFO] Connected to localhost:<socket.socket fd=1516, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0, laddr=('127.0.0.1', 55108), raddr=('127.0.0.1', 9006)>
-2023-05-12 08:01:08,996 [INFO] Connection from ('127.0.0.1', 55111)
-2023-05-12 08:01:08,996 [INFO] Connection from ('127.0.0.1', 55117)
-2023-05-12 08:01:09,011 [INFO] Connection from ('127.0.0.1', 55123)
-2023-05-12 08:01:09,011 [INFO] Connection from ('127.0.0.1', 55129)
-2023-05-12 08:01:09,011 [INFO] Stopping server
-2023-05-12 08:01:09,011 [INFO] Connection to remote nodes closed
-2023-05-12 08:01:11,533 [INFO] Received from ('127.0.0.1', 55092): {'type': 'values', 'payload': 1}
-2023-05-12 08:01:11,533 [INFO] Ensuring block present for consensus round {'index': 2, 'transactions': [], 'previous_hash': '03525042c7132a2ec3db14b7aa1db816e61f1311199ae2a31f3ad1c4312047d1', 'current_hash': 'ebe1c682b8618d34d9e39ef6384ff9cf62fb77de55b1986728e1034c30eb4abd'}
-2023-05-12 08:01:11,533 [INFO] Received request for values in round 1, they are [{'index': 2, 'transactions': [], 'previous_hash': '03525042c7132a2ec3db14b7aa1db816e61f1311199ae2a31f3ad1c4312047d1', 'current_hash': 'ebe1c682b8618d34d9e39ef6384ff9cf62fb77de55b1986728e1034c30eb4abd'}]
-2023-05-12 08:01:12,013 [INFO] Server thread joined
-2023-05-12 08:01:12,013 [INFO] Pipeline thread joined
-2023-05-12 08:01:12,013 [INFO] Server Stopped
+2023-05-12 14:56:44,661 [INFO] Node starting
+2023-05-12 14:56:44,673 [INFO] Server listening on localhost:9002
+2023-05-12 14:56:44,675 [INFO] Connection from ('127.0.0.1', 52641)
+2023-05-12 14:56:44,680 [INFO] Connection from ('127.0.0.1', 52647)
+2023-05-12 14:56:44,684 [INFO] Connected to localhost:<socket.socket fd=1404, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0, laddr=('127.0.0.1', 52652), raddr=('127.0.0.1', 9000)>
+2023-05-12 14:56:44,684 [INFO] Connected to localhost:<socket.socket fd=1408, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0, laddr=('127.0.0.1', 52653), raddr=('127.0.0.1', 9001)>
+2023-05-12 14:56:44,684 [INFO] Connected to localhost:<socket.socket fd=1412, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0, laddr=('127.0.0.1', 52654), raddr=('127.0.0.1', 9003)>
+2023-05-12 14:56:44,685 [INFO] Connected to localhost:<socket.socket fd=1448, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0, laddr=('127.0.0.1', 52655), raddr=('127.0.0.1', 9004)>
+2023-05-12 14:56:44,687 [INFO] Connected to localhost:<socket.socket fd=1472, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0, laddr=('127.0.0.1', 52656), raddr=('127.0.0.1', 9005)>
+2023-05-12 14:56:44,687 [INFO] Connected to localhost:<socket.socket fd=1488, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0, laddr=('127.0.0.1', 52657), raddr=('127.0.0.1', 9006)>
+2023-05-12 14:56:44,689 [INFO] Connection from ('127.0.0.1', 52660)
+2023-05-12 14:56:44,694 [INFO] Connection from ('127.0.0.1', 52666)
+2023-05-12 14:56:44,699 [INFO] Connection from ('127.0.0.1', 52672)
+2023-05-12 14:56:44,703 [INFO] Connection from ('127.0.0.1', 52678)
+2023-05-12 14:56:44,712 [INFO] Stopping server
+2023-05-12 14:56:44,715 [INFO] Connection to remote nodes closed
+2023-05-12 14:56:47,225 [INFO] Received from ('127.0.0.1', 52641): {'type': 'values', 'payload': 1}
+2023-05-12 14:56:47,226 [INFO] Ensuring block present for consensus round {'index': 2, 'transactions': [], 'previous_hash': '03525042c7132a2ec3db14b7aa1db816e61f1311199ae2a31f3ad1c4312047d1', 'current_hash': 'ebe1c682b8618d34d9e39ef6384ff9cf62fb77de55b1986728e1034c30eb4abd'}
+2023-05-12 14:56:47,226 [INFO] Received request for values in round 1, they are [{'index': 2, 'transactions': [], 'previous_hash': '03525042c7132a2ec3db14b7aa1db816e61f1311199ae2a31f3ad1c4312047d1', 'current_hash': 'ebe1c682b8618d34d9e39ef6384ff9cf62fb77de55b1986728e1034c30eb4abd'}]
+2023-05-12 14:56:47,703 [INFO] Server thread joined
+2023-05-12 14:56:47,705 [INFO] Pipeline thread joined
+2023-05-12 14:56:47,705 [INFO] Server Stopped
